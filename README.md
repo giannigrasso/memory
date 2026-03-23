@@ -1,4 +1,4 @@
-# group01
+# Memory
 
 
 
@@ -15,16 +15,16 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab-edu.supsi.ch/dti-isin/labingsw/labingsw01/20252026/memory/group01.git
+git remote add origin https://gitlab-edu.supsi.ch/dti-isin/labingsw/labingsw01/labs/memory.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-* [Set up project integrations](https://gitlab-edu.supsi.ch/dti-isin/labingsw/labingsw01/20252026/memory/group01/-/settings/integrations)
+* [Set up project integrations](https://gitlab-edu.supsi.ch/dti-isin/labingsw/labingsw01/labs/memory/-/settings/integrations)
 
-## Collaborate with your team
+## Collaborate with your team7
 
 * [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
 * [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
