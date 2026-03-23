@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<ToolBar fx:id="toolBar" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <Button fx:id="newButton" mnemonicParsing="false" disable="false" text="New..."/>
+    <Separator fx:id="separator1" orientation="VERTICAL"/>
+    <Button fx:id="saveButton" mnemonicParsing="false" disable="true" text="Save"/>
+ </ToolBar>
