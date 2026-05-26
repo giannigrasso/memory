@@ -55,7 +55,7 @@ memory:
 
   artifacts:
     paths:
-      - backend/target/backend-0.1.jar
-      - i18n/target/i18n-0.1.jar
-      - frontend/javafx/target/memory-gui-0.1.jar
-      - frontend/tui/target/memory-tui-0.1.jar
+      - backend/target/backend-0.9.jar
+      - i18n/target/i18n-0.9.jar
+      - frontend/javafx/target/memory-gui-0.9.jar
+      - frontend/tui/target/memory-tui-0.9.jar
