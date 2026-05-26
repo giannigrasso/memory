@@ -7,7 +7,7 @@
 
     <groupId>ch.supsi.memory</groupId>
     <artifactId>memory</artifactId>
-    <version>1.0</version>
+    <version>0.9</version>
     <packaging>pom</packaging>
 
     <modules>

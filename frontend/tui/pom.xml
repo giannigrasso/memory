@@ -6,7 +6,7 @@
     <parent>
         <groupId>ch.supsi.memory</groupId>
         <artifactId>frontend</artifactId>
-        <version>0.1</version>
+        <version>0.9</version>
     </parent>
 
     <artifactId>frontend-tui</artifactId>
