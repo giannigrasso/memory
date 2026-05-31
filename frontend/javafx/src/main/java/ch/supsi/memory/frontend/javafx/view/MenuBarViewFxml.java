@@ -85,40 +85,17 @@ public class MenuBarViewFxml implements ControlledFxView {
         this.newMenuItem.setOnAction(event -> {
             NewGameCommand newGameCmd = commands.get(NewGameCommand.class);
             newGameCmd.execute();
-
-            FeedbackCommand feedbackCmd = commands.get(FeedbackCommand.class);
-            feedbackCmd.setText(this.translator.translate("label.feedback.new_game"));
-            feedbackCmd.execute();
         });
 
         // save
         this.saveMenuItem.setOnAction(event -> {
             commands.get(SaveCommand.class).execute();
-
-            FeedbackCommand feedbackCmd = commands.get(FeedbackCommand.class);
-            // since this button will only be enabled when the game has a save
-            // file path, then the optional will always be present.
-            String filePath = this.gameModel.getFilePath().get().toString();
-            String text = this.translator.translate("label.feedback.saved_game")
-                    .replace("%path", filePath);
-            feedbackCmd.setText(text);
-            feedbackCmd.execute();
         });
 
         // saveAs
         this.saveAsMenuItem.setOnAction(event -> {
             SaveAsCommand saveAsCmd = commands.get(SaveAsCommand.class);
             saveAsCmd.execute();
-
-            FeedbackCommand feedbackCmd = commands.get(FeedbackCommand.class);
-            // double check to be perfectly sure (and to remove the warning lol)
-            if (this.gameModel.hasFilePath() && this.gameModel.getFilePath().isPresent()) {
-                String filePath = this.gameModel.getFilePath().get().toString();
-                String text = this.translator.translate("label.feedback.saved_game")
-                        .replace("%path", filePath);
-                feedbackCmd.setText(text);
-                feedbackCmd.execute();
-            }
         });
 
         this.quitMenuItem.setOnAction(event -> commands.get(QuitCommand.class).execute());
@@ -126,14 +103,6 @@ public class MenuBarViewFxml implements ControlledFxView {
         this.openMenuItem.setOnAction(event -> {
             LoadGameCommand loadCmd = commands.get(LoadGameCommand.class);
             loadCmd.execute();
-
-            // TODO: if load popup is cancelled it still prints the loaded msg.
-            // i tried moving it to the controller but i dont now how we could
-            // get a ref of 'commands'.
-            FeedbackCommand feedbackCmd = commands.get(FeedbackCommand.class);
-            // TODO: use preferences model to show loaded game batchsize
-            feedbackCmd.setText(this.translator.translate("label.feedback.loaded_game"));
-            feedbackCmd.execute();
         });
 
         this.aboutMenuItem.setOnAction(event -> commands.get(AboutCommand.class).execute());

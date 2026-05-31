@@ -72,7 +72,7 @@ public class HelpModel extends AbstractModel implements HelpEventHandler {
 
     @Override
     public String getFeatPreferences() {
-        return "label.help.features.load";
+        return "label.help.features.preferences";
     }
 
     @Override

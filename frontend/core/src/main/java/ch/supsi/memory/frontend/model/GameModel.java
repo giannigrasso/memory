@@ -1,7 +1,9 @@
 package ch.supsi.memory.frontend.model;
 
+import ch.supsi.memory.backend.application.BackendException;
 import ch.supsi.memory.backend.application.GameController;
 import ch.supsi.memory.backend.model.GameObject;
+import ch.supsi.memory.frontend.controller.GameOperationException;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -39,6 +41,7 @@ public class GameModel extends AbstractModel implements GameEventHandler, QuitEv
     @Override
     public boolean newGame(int batchSize) {
         this.backend.newGame(batchSize);
+        this.setFilePath(null);
         this.noGameLoaded = false;
 
         return true;
@@ -46,12 +49,27 @@ public class GameModel extends AbstractModel implements GameEventHandler, QuitEv
 
     @Override
     public boolean save() {
-        return this.backend.save(this.filePath);
+        try {
+            return this.backend.save(this.filePath);
+        } catch (BackendException e) {
+            throw new GameOperationException(
+                    GameOperationException.Reason.SAVE_FAILED,
+                    "failed to save",
+                    e);
+        }
     }
 
     @Override
     public boolean load(Path path) {
-        boolean result = this.backend.load(path) != null;
+        final boolean result;
+        try {
+            result = this.backend.load(path) != null;
+        } catch (BackendException e) {
+            throw new GameOperationException(
+                    GameOperationException.Reason.LOAD_FAILED,
+                    "failed to load game",
+                    e);
+        }
 
         if (result) {
             this.filePath = path;
@@ -78,12 +96,23 @@ public class GameModel extends AbstractModel implements GameEventHandler, QuitEv
 
     @Override
     public boolean flip(int[] coords) {
-        // TODO: handle out of bounds exception
-        if (this.backend.flip(coords)) {
-            // ...
-        }
+        try {
+            return this.backend.flip(coords);
+        } catch (BackendException e) {
+            // meh...
+            // would be better if we had this differentiation at Exception level imo
+            if (this.noGameLoaded) {
+                throw new GameOperationException(
+                        GameOperationException.Reason.NO_GAME_LOADED,
+                        "no game loaded",
+                        e);
+            }
 
-        return true;
+            throw new GameOperationException(
+                    GameOperationException.Reason.BAD_FLIP,
+                    "bad flip",
+                    e);
+        }
     }
 
     public boolean isDirty() {
@@ -95,10 +124,21 @@ public class GameModel extends AbstractModel implements GameEventHandler, QuitEv
         return this.backend.getBatchSize();
     }
 
+    @Override
+    public int getGridWidth() {
+        return backend.getGridCoordinateX();
+    }
+
+    @Override
+    public int getGridHeight() {
+        return backend.getGridCoordinateY();
+    }
+
     public boolean isNoGameLoaded() {
         return this.noGameLoaded;
     }
 
+    @Override
     public int getCurrentTurnFlippedCount() {
         return this.backend.getCurrentTurnFlippedCount();
     }
@@ -107,4 +147,6 @@ public class GameModel extends AbstractModel implements GameEventHandler, QuitEv
     public boolean isSafeToQuit() {
         return !this.isDirty();
     }
+
+
 }

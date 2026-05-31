@@ -6,6 +6,11 @@ import ch.supsi.memory.frontend.init.InitPhase;
 import ch.supsi.memory.frontend.model.*;
 import ch.supsi.memory.frontend.tui.cli.*;
 import ch.supsi.memory.frontend.tui.controller.QuitDirectorTui;
+import ch.supsi.memory.frontend.tui.init.TranslationsLoaderTui;
+import ch.supsi.memory.frontend.tui.provider.FilePathProviderTui;
+import ch.supsi.memory.frontend.tui.provider.LoadConfirmationProviderTui;
+import ch.supsi.memory.frontend.tui.provider.QuitConfirmationProviderTui;
+import ch.supsi.memory.frontend.tui.view.*;
 import ch.supsi.memory.frontend.view.ControlledView;
 import ch.supsi.memory.frontend.view.FilePathProvider;
 import ch.supsi.memory.frontend.view.UncontrolledView;
@@ -30,11 +35,10 @@ public class MainTui {
     private final UncontrolledView userFeedbackView;
     private final UncontrolledView helpView;
     private final UncontrolledView aboutView;
-    private final ControlledView preferencesView;
+    private final ControlledTuiView preferencesView;
+    private final UncontrolledView welcomeView;
 
     private final GameEventController gameController;
-    private final UserFeedbackEventController feedbackController;
-    private final QuitEventController quitController;
     private final HelpEventController helpController;
     private final AboutEventController aboutController;
     private final PreferencesEventController preferencesController;
@@ -45,12 +49,15 @@ public class MainTui {
     private final FilePathProvider loadPathProvider;
     private final FilePathProvider savePathProvider;
 
-    private QuitMediator quitMediator;
+    private final QuitEventController quitController;
     private QuitDirector quitDirector;
 
     private final CommandRegistry commands;
+    private final Scanner input;
 
     public MainTui() {
+        this.input = new Scanner(System.in);
+
         // MODELS
         this.translator = I18nAdapter.getInstance(); // created in InitPhase::run
         this.gameModel = GameModel.getInstance();
@@ -60,66 +67,63 @@ public class MainTui {
         this.preferencesModel = PreferencesModel.getInstance();
 
         // VIEWS
-        this.menuBarView = null;
+        this.menuBarView = MenuBarViewTui.getInstance();
         this.toolBarView = null;
-        this.gameBoardView = null;
-        this.userFeedbackView = null;
-        this.helpView = null;
-        this.aboutView = null;
-        this.preferencesView = null;
+        this.gameBoardView = GameBoardViewTui.getInstance();
+        this.userFeedbackView = UserFeedbackViewTui.getInstance();
+        this.helpView = HelpViewTui.getInstance();
+        this.aboutView = AboutViewTui.getInstance();
+        this.preferencesView = PreferencesViewTui.getInstance();
+        this.welcomeView = WelcomeViewTui.getInstance();
 
         // CONTROLLERS
         this.preferencesController = PreferencesController.getInstance(); // created in InitPhase::run
         this.gameController = GameController.getInstance();
-        this.feedbackController = UserFeedbackController.getInstance();
         this.quitController = QuitController.getInstance();
         this.helpController = HelpController.getInstance();
         this.aboutController = AboutController.getInstance();
 
         // MODALS
-        this.confirmQuitModal = null;
-        this.confirmLoadModal = null;
-        this.loadPathProvider = new CliFilePathProvider(new String[0]);
-        this.savePathProvider = new CliFilePathProvider(new String[0]);
+        this.confirmQuitModal = new QuitConfirmationProviderTui(this.input, this.translator);
+        this.confirmLoadModal = new LoadConfirmationProviderTui(this.input, this.translator);
+        this.loadPathProvider = new FilePathProviderTui(new String[0]);
+        this.savePathProvider = new FilePathProviderTui(new String[0]);
 
         // COMMANDS
         this.commands = new CommandRegistry(
                 this.gameController,
-                this.feedbackController,
                 this.preferencesController,
                 this.quitController,
                 this.aboutController,
                 this.helpController);
 
         // SCAFFOLDING of M-V-C
-//        this.menuBarView.initialize(commands, this.gameModel, this.translator);
+        this.menuBarView.initialize(commands, this.gameModel, this.translator);
 //        this.toolBarView.initialize(commands, this.gameModel, this.translator);
-//        this.gameBoardView.initialize(commands, this.gameModel, this.translator);
-//        this.userFeedbackView.initialize(this.userFeedbackModel, this.translator);
-//        this.helpView.initialize(this.helpModel, this.translator);
-//        this.aboutView.initialize(this.aboutModel, this.translator);
-//        this.preferencesView.initialize(commands, this.preferencesModel, this.translator);
+        this.gameBoardView.initialize(commands, this.gameModel, this.translator);
+        this.userFeedbackView.initialize(this.userFeedbackModel, this.translator);
+        this.helpView.initialize(this.helpModel, this.translator);
+        this.aboutView.initialize(this.aboutModel, this.translator);
+        this.preferencesView.initialize(commands, this.preferencesModel, this.translator);
+        this.preferencesView.setInput(this.input);
+        this.welcomeView.initialize(null, this.translator);
 
         GameController.getInstance().init(
-//                List.of(this.menuBarView, this.toolBarView, this.gameBoardView),
-                List.of(),
+                List.of(menuBarView, gameBoardView),
+                userFeedbackView,
                 confirmLoadModal,
                 loadPathProvider,
                 savePathProvider);
-//        UserFeedbackController.getInstance().initialize(List.of(this.userFeedbackView));
-//        HelpController.getInstance().initialize(List.of(this.helpView));
-//        AboutController.getInstance().initialize(List.of(this.aboutView));
-//        PreferencesController.getInstance().initialize(List.of(this.preferencesView));
+        HelpController.getInstance().initialize(List.of(this.helpView));
+        AboutController.getInstance().initialize(List.of(this.aboutView));
+        PreferencesController.getInstance().initialize(List.of(this.preferencesView));
     }
 
     public void start() {
-        this.quitMediator = new QuitMediatorImpl();
         this.quitDirector = new QuitDirectorTui(
                 (QuitEventHandler) this.gameModel,
                 this.confirmQuitModal);
-        this.quitMediator.registerQuitDirector(this.quitDirector);
-
-        QuitController.getInstance().initialize(this.quitMediator);
+        QuitController.getInstance().registerQuitDirector(this.quitDirector);
 
         // STARTUP FEEDBACK
 //        final FeedbackCommand feedbackCmd = commands.get(FeedbackCommand.class);
@@ -132,27 +136,30 @@ public class MainTui {
         factories.put("about", new AboutCliCommandFactory(this.aboutController));
         factories.put("flip", new FlipCliCommandFactory(this.gameController));
         factories.put("help", new HelpCliCommandFactory(this.helpController));
-        factories.put("load", new LoadGameCliCommandFactory(this.gameController, (CliFilePathProvider) this.loadPathProvider));
+        factories.put("load", new LoadGameCliCommandFactory(this.gameController, (FilePathProviderTui) this.loadPathProvider));
         factories.put("new", new NewGameCliCommandFactory(this.gameController, this.preferencesController));
         factories.put("quit", new QuitCliCommandFactory(this.quitController));
         factories.put("save", new SaveCliCommandFactory(this.gameController));
-        factories.put("saveas", new SaveAsCliCommandFactory(this.gameController, (CliFilePathProvider) this.savePathProvider));
+        factories.put("saveas", new SaveAsCliCommandFactory(this.gameController, (FilePathProviderTui) this.savePathProvider));
         factories.put("prefs", new ShowPreferencesCliCommandFactory(this.preferencesController));
 
-        final Scanner input = new Scanner(System.in);
+        this.welcomeView.update();
+        this.menuBarView.update();
 
-        final CliCommandHandler cmdHandler = new CliCommandHandler(input, factories);
-        while (true) {
+        final CliCommandHandler cmdHandler = new CliCommandHandler(this.input, factories);
+        while (!((QuitDirectorTui) this.quitDirector).mustQuit()) {
             try {
                 cmdHandler.handleLine();
             } catch (CliCommandFactory.CliCommandException e) {
                 System.out.println(e.getLocalizedMessage(this.translator));
             }
         }
+
+        this.input.close();
     }
 
     public static void main(String[] args) {
-        InitPhase.run();
+        InitPhase.run(List.of(new TranslationsLoaderTui()));
         new MainTui().start();
     }
 }

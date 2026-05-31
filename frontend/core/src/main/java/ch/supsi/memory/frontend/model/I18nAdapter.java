@@ -2,9 +2,12 @@ package ch.supsi.memory.frontend.model;
 
 import ch.supsi.memory.i18n.application.TranslationController;
 
+import java.util.Locale;
 import java.util.Properties;
 
 public class I18nAdapter implements TranslationProvider {
+
+    public static final Locale FALLBACK_LOCALE = Locale.of("en", "US");
 
     private static I18nAdapter myself;
 

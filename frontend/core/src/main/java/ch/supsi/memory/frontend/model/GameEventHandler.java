@@ -22,4 +22,10 @@ public interface GameEventHandler extends EventHandler {
     boolean isDirty();
 
     int getBatchSize();
+
+    int getGridWidth();
+
+    int getGridHeight();
+
+    int getCurrentTurnFlippedCount();
 }

@@ -1,0 +1,47 @@
+classDiagram
+    direction TB
+
+    class TranslationController {
+        +getInstance() TranslationController$
+        +translate(key: String) String
+        +pushTranslations(translations: Properties, forLanguageTag: String) void
+        +setLanguageTag(languageTag: String) boolean
+    }
+
+    class TranslationService {
+        <<interface>>
+        +translate(key: String) String
+        +pushTranslations(translations: Properties, forLanguageTag: String) void
+        +isLanguageTagSupported(languageTag: String) boolean
+        +setLanguageTag(languageTag: String) boolean
+    }
+
+    class TranslationPropertiesService {
+        -String languageTag
+        -Properties translations
+        +getInstance() TranslationService$
+        +translate(key: String) String
+        +pushTranslations(translations: Properties, forLanguageTag: String) void
+        +isLanguageTagSupported(languageTag: String) boolean
+        +setLanguageTag(languageTag: String) boolean
+    }
+
+    class TranslationDao {
+        <<interface>>
+        +pushTranslations(translations: Properties, languageTag: String) void
+        +getSupportedLanguageTags() Set~String~
+        +getTranslations(languageTag: String) Properties
+    }
+
+    class TranslationPropertiesDao {
+        -Map~String, Properties~ translationResources
+        +getInstance() TranslationDao$
+        +pushTranslations(translations: Properties, languageTag: String) void
+        +getSupportedLanguageTags() Set~String~
+        +getTranslations(languageTag: String) Properties
+    }
+
+    TranslationController o-- "1" TranslationService : has
+    TranslationPropertiesService o-- "1" TranslationDao : has
+    TranslationPropertiesService ..|> TranslationService : implements
+    TranslationPropertiesDao ..|> TranslationDao : implements

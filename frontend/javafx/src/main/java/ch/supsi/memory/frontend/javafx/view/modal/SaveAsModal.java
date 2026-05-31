@@ -22,7 +22,7 @@ public class SaveAsModal implements FilePathProvider {
 
         fileChooser.setTitle(this.translator.translate("label.saveas"));
         FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("Memory Game files (*.mem)", "*.mem");
+                new FileChooser.ExtensionFilter("JSON (*.json)", "*.json");
         fileChooser.getExtensionFilters().add(extFilter);
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 

@@ -18,10 +18,10 @@ public class SaveCliCommandFactory implements CliCommandFactory {
             throw new CliCommandException(getUsage());
         }
         if (!this.gameController.isDirty()) {
-            throw new CliCommandException("no new modifications", "label.tui.errors.not_dirty");
+            throw new CliCommandException("no new modifications", "label.errors.not_dirty");
         }
         if (!this.gameController.hasFilePath()) {
-            throw new CliCommandException("game has no save path", "label.tui.errors.no_path");
+            throw new CliCommandException("game has no save path", "label.errors.no_path");
         }
 
         return new SaveCommand(this.gameController);

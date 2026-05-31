@@ -15,7 +15,6 @@ public class CommandRegistry {
 
     public CommandRegistry(
             GameEventController gameEventController,
-            UserFeedbackEventController userFeedbackEventController,
             PreferencesEventController preferencesEventController,
             QuitEventController quitEventController,
             AboutEventController aboutEventController,
@@ -31,7 +30,6 @@ public class CommandRegistry {
         register(new HelpCommand(helpEventController));
         register(new LoadGameCommand(gameEventController));
         register(new QuitCommand(quitEventController));
-        register(new FeedbackCommand(userFeedbackEventController));
         register(new ShowPreferencesCommand(preferencesEventController));
         register(new EditPreferencesCommand(preferencesEventController));
     }

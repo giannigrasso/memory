@@ -2,7 +2,6 @@ package ch.supsi.memory.frontend.javafx.view;
 
 import ch.supsi.memory.backend.model.GameObject;
 import ch.supsi.memory.frontend.command.CommandRegistry;
-import ch.supsi.memory.frontend.command.FeedbackCommand;
 import ch.supsi.memory.frontend.command.FlipCommand;
 import ch.supsi.memory.frontend.model.AbstractModel;
 import ch.supsi.memory.frontend.model.GameModel;
@@ -223,7 +222,6 @@ public class GameBoardViewFxml implements ControlledFxView {
 
     private void createBehaviour(CommandRegistry commands) {
         FlipCommand flipCmd = commands.get(FlipCommand.class);
-        FeedbackCommand feedbackCmd = commands.get(FeedbackCommand.class);
 
         for (int row = 0; row < this.gridButtons.length; row++) {
             for (int column = 0; column < this.gridButtons[row].length; column++) {
@@ -234,15 +232,6 @@ public class GameBoardViewFxml implements ControlledFxView {
                 btn.setOnAction(event -> {
                     flipCmd.setCell(x, y);
                     flipCmd.execute();
-
-                    int flipped = this.gameModel.getCurrentTurnFlippedCount();
-                    final String msg = String.format(
-                            "%s %d/%d%n",
-                            this.translator.translate("label.flipped"),
-                            flipped,
-                            this.gameModel.getBatchSize());
-                    feedbackCmd.setText(msg);
-                    feedbackCmd.execute();
                 });
             }
         }

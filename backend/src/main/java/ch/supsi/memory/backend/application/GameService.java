@@ -22,4 +22,8 @@ public interface GameService {
     int getCurrentTurnFlippedCount();
 
     int getBatchSize();
+
+    int getGridCoordinateX();
+
+    int getGridCoordinateY();
 }

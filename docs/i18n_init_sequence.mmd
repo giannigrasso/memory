@@ -1,0 +1,68 @@
+sequenceDiagram
+    actor CC as Caller
+    participant IP as InitPhase
+    participant TL as TranslationsLoader
+    participant A as I18nAdapter
+    participant TC as TranslationController
+    participant PC as PreferencesController
+
+    CC->>IP: InitPhase.run(customLoaders)
+    activate IP
+    IP-->>IP: prefC = requirePreferencesController()
+    activate IP
+    deactivate IP
+    IP->>IP: requireTranslationProvider()
+    activate IP
+
+    IP-->>A: translator = I18nAdapter.getInstance()
+    activate A
+    A-->>TC: translC = TranslationController.getInstance()
+    activate TC
+    TC-->>TC: init service and dao
+    deactivate TC
+    deactivate A
+    deactivate IP
+    IP->>PC: userLocale = getUserLocale()
+    activate PC
+    deactivate PC
+
+    IP->>IP: initializeTranslations(translator, customLoaders, userLocale)
+    activate IP
+    loop each customLoader
+      IP->>TL: customLoader.pushSupportedTranslations()
+      activate TL
+      loop each locale
+        TL->>TL: ts = readBundle(locale)
+        TL->>A: pushTranslations(ts, locale)
+        activate A
+        A->>TC: pushTranslations(ts, locale)
+        activate TC
+        deactivate TC
+        deactivate A
+      end
+      deactivate TL
+    end
+
+    alt wasSet
+      IP->>A: wasSet = setLanguageTag(userLocale)
+      activate A
+      A->>TC: setLanguageTag(userLocale)
+        activate TC
+        deactivate TC
+      deactivate A
+    else !wasSet
+      alt fallbackSet
+        IP->>A: fallbackSet = setLanguageTag(fallback="en-US")
+        activate A
+        A->>TC: setLanguageTag(fallback)
+        activate TC
+        deactivate TC
+        deactivate A
+        IP-->>CC: notify fallback to en-US
+      else !fallbackSet
+        IP-->>CC: notify failed to set fallback
+      end
+    end
+
+    deactivate IP
+    deactivate IP

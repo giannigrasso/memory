@@ -1,10 +1,7 @@
 package ch.supsi.memory.backend.dataaccess;
 
 import ch.supsi.memory.backend.business.GameDao;
-import ch.supsi.memory.backend.dataaccess.serde.GameBinaryDeserializer;
-import ch.supsi.memory.backend.dataaccess.serde.GameBinarySerializer;
-import ch.supsi.memory.backend.dataaccess.serde.GameDeserializer;
-import ch.supsi.memory.backend.dataaccess.serde.GameSerializer;
+import ch.supsi.memory.backend.dataaccess.serde.*;
 import ch.supsi.memory.backend.model.GameModel;
 
 import java.io.IOException;

@@ -4,7 +4,7 @@ public class QuitController implements QuitEventController {
 
     private static QuitController myself;
 
-    private QuitMediator quitMediator;
+    private QuitDirector quitDirector;
 
     protected QuitController() {
     }
@@ -17,12 +17,16 @@ public class QuitController implements QuitEventController {
         return myself;
     }
 
-    public void initialize(QuitMediator quitMediator) {
-        this.quitMediator = quitMediator;
+    public void registerQuitDirector(QuitDirector director) {
+        this.quitDirector = director;
     }
 
     @Override
     public void quit() {
-        this.quitMediator.onQuitRequested();
+        if (this.quitDirector == null) {
+            throw new IllegalStateException("No QuitDirector registered");
+        }
+
+        this.quitDirector.handleQuitRequest();
     }
 }

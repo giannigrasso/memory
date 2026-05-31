@@ -1,0 +1,25 @@
+sequenceDiagram
+    actor CC as Caller
+    participant IP as InitPhase
+    participant PrefC as PreferencesController
+    participant PrefS as PreferencesPropertiesService
+    participant PrefD as PreferencesPropertiesDao
+
+    CC->>+IP: InitPhase.run()
+    IP->>+IP: requirePreferencesController()
+
+    IP->>+PrefC: PreferencesController.getInstance() 
+    PrefC->>+PrefS: PreferencesService.getInstance()
+    PrefS-->>PrefD: prefD = PreferencesPropertiesDao.getInstance()
+    activate PrefD
+    alt UserPreferencesRule.isValid(userPreferences)
+    PrefS->>PrefD: userPreferences = prefD.read()
+    deactivate PrefD
+      PrefS-->>-PrefC: prefS
+      PrefC-->>-IP: prefC 
+      deactivate IP
+    else invalid preferences
+      IP-->>CC: display dedicated error and help msg
+    else IO error
+      IP-->>-CC: display io error msg
+    end
