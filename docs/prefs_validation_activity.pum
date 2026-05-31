@@ -1,0 +1,36 @@
+@startuml
+!theme vibrant
+|InitPhase|
+start
+:InitPhase.run();
+:requirePreferencesController();
+
+|PreferencesController|
+:getInstance();
+
+|PreferencesPropertiesService|
+:getInstance();
+
+|PreferencesPropertiesDao|
+:getInstance();
+:Read preferences with prefD.read();
+
+if (IO Error?) then (Yes)
+    |InitPhase|
+    :Display IO Error Message;
+    stop
+else (No)
+    |PreferencesPropertiesService|
+    :Invoke UserPreferencesRule.isValid;
+    
+    if (Preferences Valid?) then (No (Corrupted / Invalid))
+        |InitPhase|
+        :Display Dedicated Error & Help Message;
+        stop
+    else (Yes)
+        |InitPhase|
+        :Proceed to i18n Initialization;
+        stop
+    end if
+end if
+@endum

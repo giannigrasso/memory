@@ -15,7 +15,6 @@ import javafx.scene.layout.VBox;
 
 import java.util.Properties;
 
-// TODO:
 public class PreferencesView implements ControlledFxView {
 
     private static PreferencesView myself;
@@ -80,7 +79,7 @@ public class PreferencesView implements ControlledFxView {
     }
 
     private void applyTranslations(TranslationProvider translator) {
-        dialog.setTitle(translator.translate("label.editprefs.popup.title"));
+        dialog.setTitle(translator.translate("label.editprefs.title"));
 
         langLabel.setText(translator.translate("label.editprefs.label.language"));
         batchSizeLabel.setText(translator.translate("label.editprefs.label.batch_size"));
@@ -89,7 +88,7 @@ public class PreferencesView implements ControlledFxView {
         langCombo.getItems().addAll("it-CH", "en-US");
 
         // TODO: refac hardcoded
-        batchCombo.getItems().addAll("2", "4", "6", "8");
+        batchCombo.getItems().addAll("2", "3", "4", "6", "8");
     }
 
     @Override

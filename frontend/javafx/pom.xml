@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>frontend-javafx</artifactId>
+    <name>Memory GUI</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -35,12 +36,6 @@
 
     <build>
         <finalName>memory-gui-${project.version}</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

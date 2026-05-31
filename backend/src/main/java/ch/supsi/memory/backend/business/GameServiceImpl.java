@@ -2,7 +2,9 @@ package ch.supsi.memory.backend.business;
 
 import ch.supsi.memory.backend.application.GameService;
 import ch.supsi.memory.backend.business.validate.GridCoordinatesRule;
+import ch.supsi.memory.backend.dataaccess.DataAccessException;
 import ch.supsi.memory.backend.dataaccess.GameBinaryDao;
+import ch.supsi.memory.backend.dataaccess.GameJsonDao;
 import ch.supsi.memory.backend.model.CardModel;
 import ch.supsi.memory.backend.model.Flippable;
 import ch.supsi.memory.backend.model.GameModel;
@@ -29,7 +31,8 @@ public class GameServiceImpl implements GameService {
     private boolean isDirty;
 
     protected GameServiceImpl() {
-        this.gameDao = GameBinaryDao.getInstance();
+        //this.gameDao = GameBinaryDao.getInstance();
+        this.gameDao = GameJsonDao.getInstance();
         this.gameModel = null;
 
         this.random = new Random();
@@ -82,9 +85,7 @@ public class GameServiceImpl implements GameService {
     @Override
     public boolean flip(final int[] coords) {
         if (this.gameModel == null) {
-            // since the game app starts with no loaded game, not having a loaded
-            // game is not exceptional behavior, therefore no exception is thrown.
-            return false;
+            throw new BusinessException("gameModel=null");
         }
 
         // input is validated at controller level!
@@ -150,14 +151,26 @@ public class GameServiceImpl implements GameService {
             // successfully or not.
             if (numFlipped < currentBatchSize || numFlipped == currentBatchSize && currentTurnHasMismatchedCard) {
                 this.currentTurnFlips.forEach(Flippable::flip);
-                boolean rv = this.gameDao.write(this.gameModel, path);
-                this.currentTurnFlips.forEach(Flippable::flip);
+                final boolean rv;
+                try {
+                    rv = this.gameDao.write(this.gameModel, path);
+                } catch (DataAccessException e) {
+                    throw new BusinessException("failed to save", e);
+                } finally {
+                    this.currentTurnFlips.forEach(Flippable::flip);
+                }
 
                 this.isDirty = !rv;
                 return rv;
             } else if (numFlipped == currentBatchSize && !currentTurnHasMismatchedCard) {
                 // QOL
-                boolean rv = this.gameDao.write(this.gameModel, path);
+                final boolean rv;
+                try {
+                    rv = this.gameDao.write(this.gameModel, path);
+                } catch (DataAccessException e) {
+                    throw new BusinessException("failed to save", e);
+                }
+
                 this.currentTurnFlips.clear();
                 this.currentTurnHasMismatchedCard = false;
                 this.isDirty = !rv;
@@ -165,7 +178,12 @@ public class GameServiceImpl implements GameService {
             }
         }
 
-        boolean rv = this.gameDao.write(this.gameModel, path);
+        final boolean rv;
+        try {
+            rv = this.gameDao.write(this.gameModel, path);
+        } catch (DataAccessException e) {
+            throw new BusinessException("failed to save", e);
+        }
         if (!rv) {
             return false;
         }
@@ -176,7 +194,11 @@ public class GameServiceImpl implements GameService {
     }
 
     public GameModel load(Path path) {
-        this.gameModel = this.gameDao.load(path);
+        try {
+            this.gameModel = this.gameDao.load(path);
+        } catch (DataAccessException e) {
+            throw new BusinessException("failed to read game file", e);
+        }
 
         this.isDirty = false;
         // reset turn
@@ -200,4 +222,16 @@ public class GameServiceImpl implements GameService {
     public int getBatchSize() {
         return this.gameModel.getBatchSize();
     }
+
+    @Override
+    public int getGridCoordinateX() {
+        return MAX_WIDTH;
+    }
+
+    @Override
+    public int getGridCoordinateY() {
+        return MAX_HEIGHT;
+    }
+
+
 }

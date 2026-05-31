@@ -1,10 +1,10 @@
 package ch.supsi.memory.frontend.javafx;
 
 import ch.supsi.memory.frontend.command.CommandRegistry;
-import ch.supsi.memory.frontend.command.FeedbackCommand;
 import ch.supsi.memory.frontend.controller.*;
 import ch.supsi.memory.frontend.init.InitPhase;
 import ch.supsi.memory.frontend.javafx.controller.QuitDirectorJfx;
+import ch.supsi.memory.frontend.javafx.init.TranslationsLoaderFx;
 import ch.supsi.memory.frontend.javafx.view.*;
 import ch.supsi.memory.frontend.javafx.view.modal.ConfirmLoadModal;
 import ch.supsi.memory.frontend.javafx.view.modal.ConfirmQuitModal;
@@ -40,8 +40,6 @@ public class MainFx extends Application {
     private final ControlledFxView preferencesView;
 
     private final GameEventController gameController;
-    private final UserFeedbackEventController feedbackController;
-    private final QuitEventController quitController;
     private final HelpEventController helpController;
     private final AboutEventController aboutController;
     private final PreferencesEventController preferencesController;
@@ -52,7 +50,7 @@ public class MainFx extends Application {
     private final FilePathProvider loadGameModal;
     private final FilePathProvider saveGameModal;
 
-    private QuitMediator quitMediator;
+    private final QuitEventController quitController;
     private QuitDirector quitDirector;
 
     private final CommandRegistry commands;
@@ -78,7 +76,6 @@ public class MainFx extends Application {
         // CONTROLLERS
         this.preferencesController = PreferencesController.getInstance(); // created in InitPhase::run
         this.gameController = GameController.getInstance();
-        this.feedbackController = UserFeedbackController.getInstance();
         this.quitController = QuitController.getInstance();
         this.helpController = HelpController.getInstance();
         this.aboutController = AboutController.getInstance();
@@ -92,7 +89,6 @@ public class MainFx extends Application {
         // COMMANDS
         this.commands = new CommandRegistry(
                 this.gameController,
-                this.feedbackController,
                 this.preferencesController,
                 this.quitController,
                 this.aboutController,
@@ -109,10 +105,10 @@ public class MainFx extends Application {
 
         GameController.getInstance().init(
                 List.of(this.menuBarView, this.toolBarView, this.gameBoardView),
+                userFeedbackView,
                 confirmLoadModal,
                 loadGameModal,
                 saveGameModal);
-        UserFeedbackController.getInstance().initialize(List.of(this.userFeedbackView));
         HelpController.getInstance().initialize(List.of(this.helpView));
         AboutController.getInstance().initialize(List.of(this.aboutView));
         PreferencesController.getInstance().initialize(List.of(this.preferencesView));
@@ -120,14 +116,11 @@ public class MainFx extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        this.quitMediator = new QuitMediatorImpl();
         this.quitDirector = new QuitDirectorJfx(
                 (QuitEventHandler) this.gameModel,
                 this.confirmQuitModal,
                 primaryStage);
-        this.quitMediator.registerQuitDirector(this.quitDirector);
-
-        QuitController.getInstance().initialize(this.quitMediator);
+        QuitController.getInstance().registerQuitDirector(this.quitDirector);
 
         primaryStage.setOnCloseRequest(
                 windowEvent -> {
@@ -155,17 +148,10 @@ public class MainFx extends Application {
         primaryStage.setScene(scene);
         primaryStage.toFront();
         primaryStage.show();
-
-        // STARTUP FEEDBACK
-        final FeedbackCommand feedbackCmd = commands.get(FeedbackCommand.class);
-        String text = this.translator.translate("label.feedback.press_new_to_start");
-        text = text.replace("%new", this.translator.translate("label.new"));
-        feedbackCmd.setText(text);
-        feedbackCmd.execute();
     }
 
     public static void main(String[] args) {
-        InitPhase.run();
+        InitPhase.run(List.of(new TranslationsLoaderFx()));
         launch(args);
     }
 }

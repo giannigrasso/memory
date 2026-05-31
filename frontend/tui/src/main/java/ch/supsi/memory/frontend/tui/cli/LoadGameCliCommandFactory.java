@@ -3,14 +3,14 @@ package ch.supsi.memory.frontend.tui.cli;
 import ch.supsi.memory.frontend.command.Command;
 import ch.supsi.memory.frontend.command.LoadGameCommand;
 import ch.supsi.memory.frontend.controller.GameEventController;
-import ch.supsi.memory.frontend.tui.CliFilePathProvider;
+import ch.supsi.memory.frontend.tui.provider.FilePathProviderTui;
 
 public class LoadGameCliCommandFactory implements CliCommandFactory {
 
     private final GameEventController gameController;
-    private final CliFilePathProvider filePathProvider;
+    private final FilePathProviderTui filePathProvider;
 
-    public LoadGameCliCommandFactory(GameEventController gameController, CliFilePathProvider filePathProvider) {
+    public LoadGameCliCommandFactory(GameEventController gameController, FilePathProviderTui filePathProvider) {
         this.gameController = gameController;
         this.filePathProvider = filePathProvider;
     }

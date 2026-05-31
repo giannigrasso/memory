@@ -4,7 +4,6 @@ import ch.supsi.memory.i18n.application.TranslationService;
 import ch.supsi.memory.i18n.dataaccess.TranslationPropertiesDao;
 
 import java.util.Properties;
-import java.util.Set;
 
 public class TranslationPropertiesService implements TranslationService {
 
@@ -13,8 +12,6 @@ public class TranslationPropertiesService implements TranslationService {
     private static TranslationService myself;
 
     private final TranslationDao translationDao;
-
-    private final Set<String> supportedLanguageTags;
 
     private String languageTag;
 
@@ -26,7 +23,6 @@ public class TranslationPropertiesService implements TranslationService {
         this.translations = new Properties();
         this.languageTag = DEFAULT_LANGUAGE_TAG;
         this.translationDao.pushTranslations(this.translations, this.languageTag);
-        this.supportedLanguageTags = this.translationDao.getSupportedLanguageTags();
     }
 
     public static TranslationService getInstance() {
@@ -39,7 +35,7 @@ public class TranslationPropertiesService implements TranslationService {
 
     @Override
     public boolean isLanguageTagSupported(String languageTag) {
-        return this.supportedLanguageTags.contains(languageTag);
+        return this.translationDao.getSupportedLanguageTags().contains(languageTag);
     }
 
     @Override

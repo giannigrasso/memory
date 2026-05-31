@@ -1,0 +1,22 @@
+@startuml
+!theme vibrant
+
+package memory as "memory" {
+
+    package backend as "<<module>>"
+    package i18n as "<<module>>"
+
+    package frontend as "frontend" {
+
+        package core as "<<module>>"
+        package javafx as "<<module>>"
+        package tui as "<<module>>"
+    }
+}
+
+javafx ..> core
+tui ..> core
+
+core ..> backend
+core ..> i18n
+@enduml

@@ -10,14 +10,20 @@ public class QuitDirectorTui implements QuitDirector {
 
     private final UserConfirmationProvider confirmQuitProvider;
 
+    private boolean mustQuit;
+
     public QuitDirectorTui(QuitEventHandler quitModel, UserConfirmationProvider confirmQuitProvider) {
         this.quitModel = quitModel;
         this.confirmQuitProvider = confirmQuitProvider;
+        this.mustQuit = false;
     }
 
     private void doQuit() {
-        System.out.println("quitting...");
-        System.exit(0);
+        this.mustQuit = true;
+    }
+
+    public boolean mustQuit() {
+        return mustQuit;
     }
 
     @Override

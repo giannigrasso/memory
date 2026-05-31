@@ -1,0 +1,23 @@
+classDiagram
+    direction BT
+
+    namespace frontend-core {
+      class TranslationProvider {
+          <<interface>>
+          +translate(String key) String
+          +setLanguageTag(String languageTag) boolean
+          +pushTranslations(Properties translations, String forLanguageTag) void
+      }
+
+      class I18nAdapter {
+          -TranslationController backend
+      }
+    }
+
+    namespace i18n {
+      class TranslationController {
+      }
+    }
+
+    I18nAdapter ..|> TranslationProvider : implements
+    I18nAdapter --> TranslationController : delegates to (backend)

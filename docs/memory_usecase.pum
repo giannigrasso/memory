@@ -1,0 +1,39 @@
+@startuml
+left to right direction
+
+actor "User" as u
+
+rectangle "Memory Game" {
+  usecase "Start application" as sapp
+  usecase "Load preferences" as loadp
+  usecase "Notify invalid preferences" as ninvp
+  usecase "Start new game" as ng
+  usecase "Load game" as lg
+  usecase "Save game" as sg
+  usecase "Flip card" as fc
+  usecase "View help" as gh
+  usecase "View about" as ga
+  usecase "Edit preferences" as ep
+  usecase "Change language" as cl
+  usecase "Change cluster size" as ccs
+  usecase "Quit" as quit
+  usecase "Ask confirmation" as askc
+
+}
+
+u -- sapp
+u -- ng
+u -- lg
+u -- sg
+u -- fc
+u -- gh
+u -- ga
+u -- ep
+u -- quit
+sapp ..> loadp : <<include>>
+sapp <.. ninvp : <<extend>>
+ep <.. cl : <<extend>>
+ep <.. ccs : <<extend>>
+quit <.. askc : <<extend>>
+
+@enduml

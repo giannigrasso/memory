@@ -11,24 +11,22 @@ import static java.util.ResourceBundle.Control.FORMAT_DEFAULT;
 
 public class TranslationsLoader {
 
-    public static final String RESOURCES_BASE_NAME = "i18n.labels";
+    private final String resourcesBaseName;
 
-    public static final Locale FALLBACK_LOCALE = Locale.of("en", "US");
-
-    public static final List<Locale> SUPPORTED_LOCALES = List.of(
-            FALLBACK_LOCALE,
-            Locale.of("it", "CH"));
+    private final List<Locale> supportedLocales;
 
     private final TranslationProvider translator;
 
-    public TranslationsLoader(TranslationProvider translator) {
+    public TranslationsLoader(TranslationProvider translator, String resourcesBaseName, List<Locale> supportedLocales) {
+        this.resourcesBaseName = resourcesBaseName;
+        this.supportedLocales = supportedLocales;
         this.translator = translator;
     }
 
     private Properties readBundle(Locale locale) {
         Properties translations = new Properties();
         ResourceBundle bundle = ResourceBundle.getBundle(
-                RESOURCES_BASE_NAME,
+                resourcesBaseName,
                 locale,
                 ResourceBundle.Control.getNoFallbackControl(FORMAT_DEFAULT));
         // we use Properties because it has a simpler API, and it is serializable,
@@ -38,29 +36,10 @@ public class TranslationsLoader {
         return translations;
     }
 
-    private void pushSupportedTranslations() {
-        for (Locale supportedLocale : SUPPORTED_LOCALES) {
+    public void pushSupportedTranslations() {
+        for (Locale supportedLocale : supportedLocales) {
             Properties translations = readBundle(supportedLocale);
             this.translator.pushTranslations(translations, supportedLocale.toLanguageTag());
-        }
-    }
-
-    public void initializeTranslations(String userLanguageTag) {
-        pushSupportedTranslations();
-        boolean wasSet = this.translator.setLanguageTag(userLanguageTag);
-        if (!wasSet) {
-            System.err.println("frontend: failed to set locale to " + userLanguageTag);
-
-            // in our case, this will always be true since the frontend fallback
-            // and the l10n module default are both 'en-US'.
-            // if the frontend default is another locale, then this needs to be checked!
-            boolean fallBackSet = this.translator
-                    .setLanguageTag(FALLBACK_LOCALE.toLanguageTag());
-            if (!fallBackSet) {
-                System.err.println("frontend: fallback locale was not pushed (" + FALLBACK_LOCALE.toLanguageTag() + ")");
-            } else {
-                System.out.println("frontend: l10n fallback to " + FALLBACK_LOCALE.toLanguageTag());
-            }
         }
     }
 }

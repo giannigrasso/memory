@@ -1,5 +1,6 @@
 package ch.supsi.memory.backend.application;
 
+import ch.supsi.memory.backend.business.BusinessException;
 import ch.supsi.memory.backend.business.GameServiceImpl;
 import ch.supsi.memory.backend.business.validate.GridCoordinatesRule;
 import ch.supsi.memory.backend.model.GameModel;
@@ -38,7 +39,11 @@ public class GameController {
             throw new BackendException(errorMsg);
         }
 
-        return gameService.flip(coords);
+        try {
+            return gameService.flip(coords);
+        } catch (BusinessException e) {
+            throw new BackendException("game not loaded", e);
+        }
     }
 
     public void newGame(int batchSize) {
@@ -54,7 +59,11 @@ public class GameController {
             throw new BackendException("bad path: null");
         }
 
-        return this.gameService.save(path);
+        try {
+            return this.gameService.save(path);
+        } catch (BusinessException e) {
+            throw new BackendException("failed to save", e);
+        }
     }
 
     public GameModel load(Path path) {
@@ -62,7 +71,11 @@ public class GameController {
             throw new BackendException("bad path: null");
         }
 
-        return this.gameService.load(path);
+        try {
+            return this.gameService.load(path);
+        } catch (BusinessException e) {
+            throw new BackendException("failed to load game", e);
+        }
     }
 
     public GameObject getAt(int[] coords) {
@@ -79,5 +92,13 @@ public class GameController {
 
     public int getBatchSize() {
         return this.gameService.getBatchSize();
+    }
+
+    public int getGridCoordinateX() {
+        return gameService.getGridCoordinateX();
+    }
+
+    public int getGridCoordinateY() {
+        return gameService.getGridCoordinateY();
     }
 }
