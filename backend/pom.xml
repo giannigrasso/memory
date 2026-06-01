@@ -10,7 +10,7 @@
     <parent>
         <groupId>ch.supsi.memory</groupId>
         <artifactId>memory</artifactId>
-        <version>0.9</version>
+        <version>1.1</version>
     </parent>
 
     <properties>

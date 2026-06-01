@@ -2,7 +2,6 @@ package ch.supsi.memory.frontend.init;
 
 import ch.supsi.memory.backend.application.PreferencesController;
 import ch.supsi.memory.backend.business.BadUserPreferencesException;
-import ch.supsi.memory.backend.business.validate.UserPreferencesRule;
 import ch.supsi.memory.frontend.model.I18nAdapter;
 import ch.supsi.memory.frontend.model.TranslationProvider;
 
@@ -24,10 +23,9 @@ public class InitPhase {
         try {
             return PreferencesController.getInstance();
         } catch (BadUserPreferencesException e) {
-            System.err.println(e.getMessage());
             System.err.println("The user preferences file is invalid or corrupted.");
             System.err.println("The file must contain the following:");
-            System.err.println(UserPreferencesRule.ERROR);
+            System.err.println(e.getMessage());
             System.err.println("Please, fix the file or remove it to reset defaults.");
             System.exit(1);
             return null;
