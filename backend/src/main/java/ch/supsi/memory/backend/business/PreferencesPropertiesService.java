@@ -31,7 +31,7 @@ public class PreferencesPropertiesService implements PreferencesService {
                 throw new BadUserPreferencesException("failed to read user preferences", new Properties(), e);
             }
             if (!UserPreferencesRule.isValid(userPreferences)) {
-                throw new BadUserPreferencesException("invalid user preferences", userPreferences);
+                throw new BadUserPreferencesException(UserPreferencesRule.ERROR, userPreferences);
             }
             model = new PreferencesPropertiesService(userPreferences);
         }

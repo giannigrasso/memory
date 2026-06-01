@@ -6,7 +6,12 @@
 
     <groupId>ch.supsi.memory</groupId>
     <artifactId>i18n</artifactId>
-    <version>0.9</version>
+
+    <parent>
+        <groupId>ch.supsi.memory</groupId>
+        <artifactId>memory</artifactId>
+        <version>1.1</version>
+    </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
